@@ -1,22 +1,22 @@
 function! PythonFilename(filepath)
-  return split(filepath, "/")[-1]
+  return split(a:filepath, "/")[-1]
 endfunction
 
 function! PythonFileBasePath(filepath)
-  parts = split(filepath, "/")
+  parts = split(a:filepath, "/")
   return parts[0:len(parts)-1]
 endfunction
 
 function! PythonFileGetTestname(filepath)
-  let filename = PythonFilename(filepath)
-  let fileBasePath = PythonFileBasePath(filepath)
+  let filename = PythonFilename(a:filepath)
+  let fileBasePath = PythonFileBasePath(a:filepath)
 
   return "tests/" . fileBasePath . "/test_" . filename
 endfunction
 
 function! PythonTestGetFilename(filepath)
-  let testFilename = PythonFilename(filepath)
-  let testFileBasePath = PythonFileBasePath(filepath)
+  let testFilename = PythonFilename(a:filepath)
+  let testFileBasePath = PythonFileBasePath(a:filepath)
 
   let filename = split(testFilename, "^test_")[0]
   let fileBasePath = split(testFileBasePath, "^tests/")[0]
@@ -27,10 +27,10 @@ endfunction
 function! PythonGetAlternateFilename(filepath)
   let fileToOpen = ""
 
-  if empty(matchstr(filepath, "tests/"))
-    let fileToOpen = PythonTestGetFilename(filepath)
+  if empty(matchstr(a:filepath, "tests/"))
+    let fileToOpen = PythonTestGetFilename(a:filepath)
   else
-    let fileToOpen = PythonFileGetTestname(filepath)
+    let fileToOpen = PythonFileGetTestname(a:filepath)
   endif
 
   return fileToOpen
@@ -48,3 +48,5 @@ function! PythonAlternateFile()
     echoerr "couldn't find file " . fileToOpen
   endif
 endfunction
+
+nnoremap <silent><leader>pa :PA<CR>

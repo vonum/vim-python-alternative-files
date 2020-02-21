@@ -1,1 +1,1 @@
-command! -buffer A :call PythonAlternateFile()
+command! -buffer PA :call PythonAlternateFile()
