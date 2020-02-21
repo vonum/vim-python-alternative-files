@@ -1,41 +1,32 @@
 function! PythonFilename(filepath)
-  let filename = split(a:filepath, "/")[-1]
-  echo filename
-  return filename
+  return split(a:filepath, "/")[-1]
 endfunction
 
-function! PythonFileBasePath(filepath)
-  let parts = split(a:filepath, "/")
-  let basepath = parts[0:len(parts)-1]
-  echo basepath
-  return basepath
+function! PythonFileBasePath(filepath, filename)
+  return join(split(a:filepath, a:filename . "$"), "")
 endfunction
 
 function! PythonFileGetTestname(filepath)
-  echo "PythonFileGetTestname"
   let filename = PythonFilename(a:filepath)
-  let fileBasePath = PythonFileBasePath(a:filepath)
+  let fileBasePath = PythonFileBasePath(a:filepath, filename)
 
-  let value = "tests/" . fileBasePath . "/test_" . filename
-  echo value
-  return value
+  return "tests/" . fileBasePath . "test_" . filename
 endfunction
 
 function! PythonTestGetFilename(filepath)
-  echo "PythonTestGetFilename"
   let testFilename = PythonFilename(a:filepath)
-  let testFileBasePath = PythonFileBasePath(a:filepath)
-
+  let testFileBasePath = PythonFileBasePath(a:filepath, testFilename)
   let filename = split(testFilename, "^test_")[0]
-  let fileBasePath = split(testFileBasePath, "^tests/")[0]
+  let fileBasePath = join(split(testFileBasePath, "^tests/"), "")
 
-  let value = fileBasePath . "/" filename
-  echo value
-  return value
+  if empty(fileBasePath)
+    return filename
+  else
+    return fileBasePath . "/" . filename
+  endif
 endfunction
 
 function! PythonGetAlternateFilename(filepath)
-  echo "PythonGetAlternateFilename"
   let fileToOpen = ""
 
   if empty(matchstr(a:filepath, "tests/"))
@@ -48,8 +39,7 @@ function! PythonGetAlternateFilename(filepath)
 endfunction
 
 function! PythonAlternateFile()
-  echo "PythonAlternateFile"
-  let currentFilePath = expand(bufname("%"))
+  let currentFilePath = fnamemodify(expand("%"), ":~:.")
   let fileToOpen = PythonGetAlternateFilename(currentFilePath)
 
   echo fileToOpen
@@ -60,5 +50,3 @@ function! PythonAlternateFile()
     echoerr "couldn't find file " . fileToOpen
   endif
 endfunction
-
-nnoremap <silent><leader>pa :PA<CR>
